@@ -1,0 +1,443 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+'------------------------------------------------------------------------------------------------
+'PINS
+'------------------------------------------------------------------------------------------------
+BT_RX     PIN 4
+BT_TX     PIN 3
+RGT_ULTRA PIN 0
+FRT_ULTRA PIN 6
+LFT_ULTRA PIN 8
+ARD_RX    PIN 10
+ARD_TX    PIN 9
+LCD_RX    PIN 11
+RGT_SERVO PIN 13
+LFT_SERVO PIN 12
+MEC_SERVO PIN 14
+
+'------------------------------------------------------------------------------------------------
+'CONSTANTS
+'------------------------------------------------------------------------------------------------
+releaseSig CON 250
+F_Command CON 10
+R_Command CON 20
+TL_Command CON 30
+TR_Command CON 40
+SL_Command CON 50
+SR_Command CON 60
+RL_Command CON 70
+RR_Command CON 80
+Load_Command CON 90
+Del_Command CON 100
+Stop_Command CON 110
+
+MechLoadPos CON 1150
+MechDeliverPos CON 800
+CmConstant CON 2260
+CSpeed CON 775
+ASpeed CON 725
+StopSpeed CON 750
+InterThresh CON 240
+LeftThresh CON 140
+RightThresh CON 110
+DistThresh CON 8
+ArdStx CON 396 ' 396:2400-8N1, 84:9600-8N1
+LCDStx CON 84 ' 396:2400-8N1, 84:9600-8N1
+BTStx CON 396 ' 396:2400-8N1, 84:9600-8N1
+
+'------------------------------------------------------------------------------------------------
+'VARIABLLES
+'------------------------------------------------------------------------------------------------
+InterCheck VAR Bit
+ObstacleCheck VAR Bit
+GPSB VAR Bit
+
+InterCount VAR Nib
+GPSA VAR Nib
+
+Counts VAR Byte
+moveCount VAR Byte
+
+arduino_R VAR Byte
+sensorVals VAR Byte(9)
+
+cmDistance VAR Word
+time VAR Word
+bluetooth_R VAR Word
+
+
+moveCount = 50
+
+InterCount = 0
+GPSA = 1 'Delivery Intersection
+GPSB = 0 '0: Turn Left, 1:Turn Right
+
+
+'------------------------------------------------------------------------------------------------
+'CODE
+'------------------------------------------------------------------------------------------------
+
+Initialization:
+  PAUSE 1000
+  'LCD Message
+  SEROUT LCD_RX,LCDStx,[22,12,17,220]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["    Welcome!    "]
+  'Stop Lft & Rgt Servos
+  GOSUB Stop_Motors
+  'Mechanism to loading positon
+  GOSUB Mech_Load
+  'Establish BT Connection
+  PAUSE 1000
+  SEROUT LCD_RX,LCDStx,[22,12,17]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["Connecting to BT......"]
+  GOSUB BT_Rec'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  PAUSE 1000
+  'Calibrate Arduino
+  SEROUT LCD_RX,LCDStx,[22,12,17,224,226]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["  Calibrating      Arduino......"]
+  GOSUB Ard_Calib
+  PAUSE 1000
+  SEROUT LCD_RX,LCDStx,[22,12,17]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["   Calibration     Complete!"]
+  'Go to mode select code block
+  GOTO Mode_Select
+
+Mode_Select:
+  GOSUB BT_Rec'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  IF(bluetooth_R = 6)THEN
+    GOSUB RC_Mode
+  ELSEIF(bluetooth_R = 7)THEN
+    GOSUB Delivery_Sequence
+  ENDIF
+  'FOR Counts = 0 TO 1
+  '  SERIN BT_TX,BTStx,[DEC bluetooth_R]
+  '  IF(Counts = 0)THEN
+  '    GPSA = bluetooth_R
+  '  ELSE
+  '    GPSB = bluetooth_R
+  '  ENDIF
+  'NEXT
+
+  'GOSUB Delivery_Sequence
+  'GOTO Mode_Select
+  GOTO Stopper
+
+Ard_Calib:
+  SEROUT ARD_RX,ArdStx,["c"]
+  GOSUB ARD_Rec
+  moveCount = 45
+  GOSUB Spin_Left
+  moveCount = 75
+  GOSUB Spin_Right
+  moveCount = 30
+  GOSUB Spin_Left
+  SEROUT ARD_RX,ArdStx,["d"]
+  GOSUB ARD_Rec
+  RETURN
+
+RC_Mode:
+  GOSUB BT_Rec
+  DO WHILE(bluetooth_R <> releaseSig)
+    SELECT bluetooth_R
+      CASE F_Command
+        moveCount = 2
+        GOSUB Move_Forward
+
+      CASE R_Command
+        moveCount = 2
+        GOSUB Move_Backward
+
+      CASE TL_Command
+        moveCount = 2
+        GOSUB Turn_Left
+
+      CASE TR_Command
+        moveCount = 2
+        GOSUB Turn_Right
+
+      CASE SL_Command
+        moveCount = 2
+        GOSUB Spin_Left
+
+      CASE SR_Command
+        moveCount = 2
+        GOSUB Spin_Right
+
+      CASE RL_Command
+        moveCount = 2
+        GOSUB Rev_Left
+
+      CASE RR_Command
+        moveCount = 2
+        GOSUB Rev_Right
+
+      CASE Load_Command
+        GOSUB Mech_Load
+
+      CASE Del_Command
+        GOSUB Mech_Deliver
+
+      CASE Stop_Command
+        GOSUB Stop_Motors
+
+    ENDSELECT
+    'Ask for next command
+    GOSUB BT_Rec
+  LOOP
+  RETURN
+
+Mech_Load:
+  FOR Counts = 1 TO 20
+    PULSOUT MEC_SERVO, MechLoadPos
+    PAUSE 50
+  NEXT
+  RETURN
+
+Mech_Deliver:
+  FOR Counts = 1 TO 20
+    PULSOUT MEC_SERVO, MechDeliverPos
+    PAUSE 50
+  NEXT
+
+Stop_Motors:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, StopSpeed
+   PULSOUT RGT_SERVO, StopSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Spin_Right:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, CSpeed
+   PULSOUT RGT_SERVO, CSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Spin_Left:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, ASpeed
+   PULSOUT RGT_SERVO, ASpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Turn_Left:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, StopSpeed
+   PULSOUT RGT_SERVO, ASpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Turn_Right:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, CSpeed
+   PULSOUT RGT_SERVO, StopSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Rev_Left:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, StopSpeed
+   PULSOUT RGT_SERVO, CSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Rev_Right:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, ASpeed
+   PULSOUT RGT_SERVO, StopSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+Move_Backward:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, ASpeed
+   PULSOUT RGT_SERVO, CSpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+
+Move_Forward:
+  FOR Counts = 1 TO moveCount
+   PULSOUT LFT_SERVO, CSpeed
+   PULSOUT RGT_SERVO, ASpeed
+   PAUSE 20
+  NEXT
+  RETURN
+
+BT_Rec:
+  SERIN BT_TX,BTStx,[DEC bluetooth_R]
+  DEBUG DEC bluetooth_R,CR
+  SEROUT LCD_RX,LCDStx,[22,12,17]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["Value from phone ",DEC bluetooth_R]
+  RETURN
+
+Ard_Rec:
+  SERIN ARD_TX,ArdStx,[DEC arduino_R]
+  DEBUG DEC arduino_R,CR
+  SEROUT LCD_RX,LCDStx,[22,12,17]'22: Turns on LCD, 12: Clears screen, 17: Turns on Backlight
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["Arduino Value:    ",DEC arduino_R]
+  RETURN
+
+Read_Pos:
+  SEROUT ARD_RX,ArdStx,["r"]
+  DEBUG CRSRXY ,0,2
+  InterCheck = 1
+  FOR Counts = 0 TO 8
+    SERIN ARD_TX,ArdStx,[DEC sensorVals(Counts)]
+
+    IF(Counts <> 0) THEN
+      DEBUG DEC3 sensorVals(Counts)," "
+      IF(sensorVals(Counts)< InterThresh)  THEN
+        InterCheck = 0
+      ENDIF
+    ENDIF
+  NEXT
+  DEBUG CR,"Line Position: ", DEC3 sensorVals(0),"  At Intersection?:",DEC1 InterCheck,CR
+  RETURN
+
+Line_Follow:
+  GOSUB Read_Pos
+  IF(sensorVals(0)>LeftThresh)THEN
+    DO WHILE(sensorVals(0)>LeftThresh)
+      moveCount = 1
+      GOSUB Spin_Left
+      'GOSUB Stop_Motors
+      GOSUB Read_Pos
+    LOOP
+  ENDIF
+
+  IF(sensorVals(0)<RightThresh)THEN
+  DO WHILE(sensorVals(0)<RightThresh)
+    moveCount = 1
+    GOSUB Spin_Right
+    'GOSUB Stop_Motors
+    GOSUB Read_Pos
+  LOOP
+  ENDIF
+
+  moveCount = 2
+  GOSUB Move_Forward
+  'GOSUB Stop_Motors
+  RETURN
+
+LT_Inter:
+  moveCount = 60
+  GOSUB Turn_Left
+  GOSUB Read_Pos
+  DO WHILE(sensorVals(0)>125)
+    moveCount = 1
+    GOSUB Turn_Left
+    GOSUB Read_Pos
+  LOOP
+  RETURN
+
+RT_Inter:
+  moveCount = 60
+  GOSUB Turn_Right
+  GOSUB Read_Pos
+  DO WHILE(sensorVals(0)<125)
+    moveCount = 1
+    GOSUB Turn_Right
+    GOSUB Read_Pos
+  LOOP
+  RETURN
+
+Turn_180:
+  moveCount = 70
+  GOSUB Spin_Right
+  GOSUB Read_Pos
+  DO WHILE(sensorVals(0)<125)
+    moveCount = 1
+    GOSUB Turn_Right
+    GOSUB Read_Pos
+  LOOP
+  RETURN
+
+DistanceMeasurement:
+  PULSOUT FRT_ULTRA, 5
+  PULSIN FRT_ULTRA, 1, time
+  cmDistance = CmConstant ** time
+  ObstacleCheck = 0
+  IF(cmDistance < DistThresh) THEN
+    ObstacleCheck = 1
+  ENDIF
+  DEBUG CRSRXY ,0,4, DEC3 cmDistance, " cm    Obstacle Detected?:",DEC1 ObstacleCheck,CR
+  RETURN
+
+Delivery_Sequence:
+  DO WHILE(InterCount < GPSA)
+    GOSUB Line_Follow
+    IF(InterCheck = 1) THEN
+      InterCount = InterCount+1
+    ENDIF
+  LOOP
+  IF(GPSB = 0) THEN
+    GOSUB LT_Inter
+  ELSE
+    GOSUB RT_Inter
+  ENDIF
+  DO WHILE(ObstacleCheck = 0)
+    GOSUB Line_Follow
+    GOSUB DistanceMeasurement
+    SEROUT LCD_RX,LCDStx,[22,12,17]
+    PAUSE 5
+    SEROUT LCD_RX, LCDStx, ["Transbot about  ",DEC2 cmDistance,"cm away"]
+  LOOP
+  GOSUB Turn_180
+  SEROUT LCD_RX,LCDStx,[22,12,17,228]
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["   Delivering       Package...  "]
+  GOSUB Mech_Deliver
+  SEROUT LCD_RX,LCDStx,[22,12,17,227,228,230]
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["    Delivery        Complete    "]
+  PAUSE 1000
+  GOSUB Mech_Load
+  GOSUB Return_Home
+  RETURN
+
+Return_Home:
+  PAUSE 5
+  SEROUT LCD_RX,LCDStx,[22,12,17,224]
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, [" Returning Home "]
+  DO WHILE(InterCheck = 0)
+    GOSUB Line_Follow
+  LOOP
+  IF(GPSB = 0) THEN
+    GOSUB RT_Inter
+  ELSE
+    GOSUB LT_Inter
+  ENDIF
+  DO WHILE(InterCount > 0)
+    GOSUB Line_Follow
+    IF(InterCheck = 1) THEN
+      InterCount = InterCount-1
+    ENDIF
+  LOOP
+  SEROUT LCD_RX,LCDStx,[22,12,17,227,228,230,228,227]
+  PAUSE 5
+  SEROUT LCD_RX, LCDStx, ["     Finito!    "]
+  GOSUB Turn_180
+  RETURN
+
+Stopper:
+  DO
+    GOSUB Read_Pos
+    PAUSE 100
+  LOOP
