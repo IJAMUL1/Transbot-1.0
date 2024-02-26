@@ -52,7 +52,21 @@ The app allows remote control and monitoring. There are 3 major phases  of the t
   
 ![076bc656-fd21-4937-976a-9d5b7a38c8ce_rw_1920](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/cbaa1481-6e05-4564-97fe-a9ac42375f63)
 ![1879ee73-cbc0-4d0a-a699-e646cd72c3c5_rw_1920](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/705b6e2b-22a2-43c7-bb55-f607a7180e32)
-![4059d68d-1503-4173-86b2-5806207f6693_rw_1200](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/002341f7-558e-4961-a378-25ac0e385d30)
+![last gui](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/773238b9-6b7c-4c01-aea3-851de386a004)
+
+*Adruino Summary*
+
+1. Arduino IDE: The Arduino Integrated Development Environment (IDE) is required to compile and upload the Arduino code to the microcontroller board.
+2. Arduino Libraries:
+    - QTRSensors library: Used for controlling the QTR Reflectance Sensor for line following.
+    - NewPing library: Used for interfacing with the ultrasonic sensor for object detection.
+    - Servo library: Used for controlling the continuous servo motors for movement.
+    - SoftwareSerial library: Used for communicating with the LCD display for output indication.
+    - Arduino Board Package: Ensure that the appropriate board package is installed in the Arduino IDE to support the microcontroller board you are using (e.g., Arduino Uno, Arduino Nano).
+  
+*Basic Stamp2 Library*
+
+Basic Stamp2 IDE: follow link here - https://www.parallax.com/download/basic-stamp-software/
 
 
 
