@@ -29,7 +29,7 @@ Here we develop a robot that can be controlled remotely and functions mainly to 
 The hardware components required for the project, include:
 - Chassis and mechanical components
 - Arduino Mega
-- Basic Stamp 2
+- Basic Stamp2
 - Custom breadboard
 - 2 x Continous Servo Motors
 - Pulolo Reflecance Sensor
@@ -43,7 +43,7 @@ The hardware components required for the project, include:
 ## Software Requirements
 
 *Transbot UI Summary*
-Note: The mobile application was created using MIT App inventor
+Note: The mobile application was created using **MIT App inventor**
 
 The app allows remote control and monitoring. There are 3 major phases  of the transbot_ui app. 
 - CALIBRATION AND MODE SELECTION: During Calibration, the operator is able to connect app to robot via Bluetooth and select mode (Autonomous or RC mode)
@@ -68,31 +68,33 @@ The app allows remote control and monitoring. There are 3 major phases  of the t
 
 Basic Stamp2 IDE: follow link here - https://www.parallax.com/download/basic-stamp-software/
 
-
-
 ## Setup Instructions
-- Reflectance Sensor: The QTR Reflectance Sensor is used for line following. Calibration is performed to ensure accurate readings.
-- Ultrasonic Sensor: NewPing library is used to interface with the ultrasonic sensor for object detection.
-- Servo Motors: Servo library is utilized to control the continuous servo motors for movement.
-- LCD Display: SoftwareSerial library is employed to communicate with the LCD display for output indication.
+
+# Arduino
+
+The Arduino setup includes:
+- Calibration routines for line following sensors.
+- Communication setup with Basic Stamp via SoftwareSerial.
+- Commands for calibration, reading sensor values, and transmitting data.
+
+# Basic Stamp2
+
+The Basic Stamp setup includes:
+- Initialization routines for sensors, servos, and Bluetooth communication.
+- Functions for controlling motors and servos based on received commands.
+- Sequences for line following, obstacle detection, and package delivery.
+
+## Integration
+The Arduino Mega and basic stamp2 were integrated using USART commmuniation protocol which allowed them exchange data in full-duplex mode.
 
 ## Additional Notes:
 Calibration of sensors is crucial for accurate readings and proper functionality.
 LED indicators are used for visual feedback, and LCD display provides additional output information.
 The system operates autonomously, following predefined rules and behaviors.
 
-## Functionality:
-- Line Following: The robot follows a predefined path marked by black tape using the QTR Reflectance Sensor.
-- Intersection Detection: Intersections are detected using sensor readings, and appropriate actions are taken at each intersection.
-- Object Detection: Objects obstructing parking spaces are detected using the ultrasonic sensor.
-- Parking Maneuvers: The robot parks in the first available parking space, considering obstacles and following specific parking rules.
-
-## Code Structure:
-The code consists of setup and loop functions, where the main logic for sensor readings, intersection handling, and parking maneuvers is implemented.
-Various functions are defined for specific actions such as line following, turning, parking, and obstacle indication.
 
 ## Usage:
-Upload the provided Arduino code to the Arduino board.
+Upload the provided Arduino and basic stamp code to the Arduino an basic stamp2 board respectively.
 Ensure all components are properly connected and calibrated.
 Monitor the output using the serial monitor and LCD display.
 Test the robot's functionality in a controlled environment to ensure proper operation.
