@@ -1,18 +1,8 @@
 # Transbot_1.0
 
-To learn more about this robotics project, look into the presentation file. You can find both arduino and basic stamp codes in the files named arduino_interface_code and basic_stamp_interface_code respectively.
-
-
-# Requirements
-
-An Arduino Nano was used for this project and you can open the arduino code using the arduino IDE.
-Also the Basic stamp2 micro controller was used as the main connector for sensors. To open the basic stamp code, you need to download the basic stamp editor software here https://www.parallax.com/download/basic-stamp-software/
-
-
-
-# Autonomous Parking Vehicle (AGV)
-
-This project involves using an Arduino UNO microcontroller to create a parking lot robot capable of autonomously navigating and parking in the nearest available spot. By combining line following, ultrasonic sensing, and a search algorithm, the robot identifies and parks in the nearest open parking space, validated through extensive testing.
+Since the introduction of the Ford Model T in 1908, advancements in transportation over many decades have coincided with tremendous improvements to the standard of living in human civilization. Self-driving/autonomous vehicles are on the cusp of being realized and their application in rendering humanitarian aid shall be essential. Vaccines and medical supplies could be delivered to hard hit areas during a pandemic without risking the spread of disease via the logistical chain. Food and water could be delivered to survivors of natural/ man-made disasters when volunteers are in limited supply. Our device, the Transbot 1.0, aims to simulate the operation of such an autonomous vehicle. The Transbot 1.0  is envisioned to do the following;
+- To be a dispatch device to provide essential products to people living in areas affected by insurgency.
+- To support delivery networks and preserve life by reducing the need for human contact therefore reducing spread of disease during a pandemic.
 
 # Parking Lot Layout
 ![parking_lot_layout](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/896fe77e-4570-4bf2-bc5a-13d0423bf5ed)
