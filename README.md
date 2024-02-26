@@ -22,21 +22,15 @@ Since the introduction of the Ford Model T in 1908, advancements in transportati
 
 ## Introduction
 
-In this project, we address the challenge of designing an autonomous parking system capable of navigating a predefined path within a parking lot, detecting available parking spaces, and efficiently maneuvering to park in the first available spot. Our solution involves the use of an Arduino-based robot equipped with sensors to detect intersections, objects obstructing parking spaces, and indicators for successful parking. This documentation provides a comprehensive overview of the project's objectives, problem statement, scenario description, task requirements, deliverables, and additional resources for implementation. Whether you're a student, hobbyist, or enthusiast interested in autonomous robotics or tackling real-world challenges with Arduino, this documentation serves as a valuable resource to understand, replicate, and contribute to our project.
-
-## Project Requirements
-
-- Line Following Robot: The robot must accurately follow the path marked by black tape within the parking lot.
-- Intersection Indication: Indicate when traversing intersections using LEDs.
-- Object Detection: Detect objects obstructing parking spaces using a single ultrasonic sensor. Provide indication of object detection through LEDs and LCD displays.
-- Parking Functionality: Successfully park in the first available parking space detected.
-- Display of Occupied Spaces: Display the number of occupied parking spaces encountered before parking using LCD displays.
+Here we develop a robot that can be controlled remotely and functions mainly to deliver essential packages to set locations. Hence, the spread of communicable diseases is hindered and supply-chain bottlenecks are avoided. The Transbot 1.0 operates in manual (RC) and autonomous modes. It interfaces with a mobile-application-based user interface and can be sent to specific locations to deliver packages. The transbot contains a Pololu QTR-8RC Reflectance sensor that enables it to remain centered as it follows the track during autonomous operation. It also contains a Bluetooth module that enables it to interface with the Transbot_UI application through serial UART communication during manual/ RC mode.
 
 ## Hardware Requirements
 
 The hardware components required for the project, include:
 - Chassis and mechanical components
-- Arduino Uno
+- Arduino Mega
+- Basic Stamp 2
+- Custom breadboard
 - 2 x Continous Servo Motors
 - Pulolo Reflecance Sensor
 - 2 x Ultrasonic Sensors
@@ -45,19 +39,22 @@ The hardware components required for the project, include:
 - Breadboard
 - Wires
 - Leds
-- Etc.
 
 ## Software Requirements
 
-Specify all the software dependencies needed to run the project, including but not limited to:
-1. Arduino IDE: The Arduino Integrated Development Environment (IDE) is required to compile and upload the Arduino code to the microcontroller board.
+*Transbot UI Summary*
+Note: The mobile application was created using MIT App inventor
 
-1. Arduino Libraries:
-    - QTRSensors library: Used for controlling the QTR Reflectance Sensor for line following.
-    - NewPing library: Used for interfacing with the ultrasonic sensor for object detection.
-    - Servo library: Used for controlling the continuous servo motors for movement.
-    - SoftwareSerial library: Used for communicating with the LCD display for output indication.
-    - Arduino Board Package: Ensure that the appropriate board package is installed in the Arduino IDE to support the microcontroller board you are using (e.g., Arduino Uno, Arduino Nano).
+The app allows remote control and monitoring. There are 3 major phases  of the transbot_ui app. 
+- CALIBRATION AND MODE SELECTION: During Calibration, the operator is able to connect app to robot via Bluetooth and select mode (Autonomous or RC mode)
+- RC MODE: In RC mode, users control Transbot's movements manually using control pad. Buttons activate the delivery mechanism or return to the mode selection screen.
+- AUTONOMOUS MODE: In autonomous mode,  operator input delivery coordinates, send GPS coordinates and start delivery. In case of obstacles, robot switches back to manual mode (RC mode) and enables operator navigate passed obstacle.
+  
+![076bc656-fd21-4937-976a-9d5b7a38c8ce_rw_1920](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/cbaa1481-6e05-4564-97fe-a9ac42375f63)
+![1879ee73-cbc0-4d0a-a699-e646cd72c3c5_rw_1920](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/705b6e2b-22a2-43c7-bb55-f607a7180e32)
+![4059d68d-1503-4173-86b2-5806207f6693_rw_1200](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/002341f7-558e-4961-a378-25ac0e385d30)
+
+
 
 ## Setup Instructions
 - Reflectance Sensor: The QTR Reflectance Sensor is used for line following. Calibration is performed to ensure accurate readings.
