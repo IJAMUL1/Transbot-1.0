@@ -4,11 +4,8 @@ Since the introduction of the Ford Model T in 1908, advancements in transportati
 - To be a dispatch device to provide essential products to people living in areas affected by insurgency.
 - To support delivery networks and preserve life by reducing the need for human contact therefore reducing spread of disease during a pandemic.
 
-# Parking Lot Layout
-![parking_lot_layout](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/896fe77e-4570-4bf2-bc5a-13d0423bf5ed)
-
 # Robot Demo
-![Untitled video - Made with Clipchamp (6)](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/e307b82f-e207-4fdd-a5fa-0d75c333c798)
+![Untitled video - Made with Clipchamp (8)](https://github.com/IJAMUL1/Automated-Factory-Guided-Vehicle/assets/60096099/4dc2dc3c-5092-43a9-b7df-07fd5d63d5f8)
 
 ## Table of Contents
 
